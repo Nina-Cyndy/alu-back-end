@@ -6,6 +6,7 @@ using a REST API.
 import requests
 import sys
 
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: ./0-gather_data_from_an_API.py <employee_id>")
@@ -17,28 +18,30 @@ if __name__ == "__main__":
         print("Employee ID must be an integer.")
         sys.exit(1)
 
-    # Get user information
+    # Fetch user data
     user_url = f"https://jsonplaceholder.typicode.com/users/{employee_id}"
     user_response = requests.get(user_url)
+
     if user_response.status_code != 200:
-        print("Employee not found.")
+        print("User not found.")
         sys.exit(1)
 
-    employee_name = user_response.json().get("name")
+    user = user_response.json()
+    employee_name = user.get("name")
 
-    # Get TODOs for the user
+    # Fetch todos
     todos_url = f"https://jsonplaceholder.typicode.com/todos?userId={employee_id}"
     todos_response = requests.get(todos_url)
+
     if todos_response.status_code != 200:
-        print("Could not fetch tasks.")
+        print("Could not retrieve TODOs.")
         sys.exit(1)
 
     todos = todos_response.json()
-    done_tasks = [task for task in todos if task.get("completed")]
     total_tasks = len(todos)
-    num_done_tasks = len(done_tasks)
+    completed_tasks = [task for task in todos if task.get("completed")]
 
-    # Display the result
-    print(f"Employee {employee_name} is done with tasks({num_done_tasks}/{total_tasks}):")
-    for task in done_tasks:
+    # Display progress
+    print(f"Employee {employee_name} is done with tasks({len(completed_tasks)}/{total_tasks}):")
+    for task in completed_tasks:
         print(f"\t {task.get('title')}")
